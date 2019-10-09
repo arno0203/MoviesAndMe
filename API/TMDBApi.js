@@ -4,13 +4,14 @@ const URI = 'https://api.themoviedb.org/3/';
 
 export function getFilmsFromApiWithSearchedText(text) {
     const url = URI + 'search/movie?api_key=' + API_TOKEN + '&language=fr&query=' + text
+    console.log(url)
     return fetch(url)
         .then((response) => response.json())
         .catch((error) => console.error(error))
 }
 
 export function getFilmDetailFromApi(id) {
-    const url = URI + 'movie/id/'+id+'?api_key=' + API_TOKEN + '&language=fr'
+    const url = URI + 'movie/'+id+'?api_key=' + API_TOKEN + '&language=fr'
     console.log(url)
     return fetch(url)
         .then((response) => response.json())
