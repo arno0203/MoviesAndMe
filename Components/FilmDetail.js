@@ -1,4 +1,6 @@
 import React from 'react'
+import moment from 'moment'
+import numeral from 'numeral'
 import {StyleSheet, View, Text, Image, ActivityIndicator, ScrollView} from 'react-native'
 import {getFilmDetailFromApi, getImagesFromApi} from '../API/TMDBApi'
 
@@ -50,7 +52,7 @@ class FilmDetail extends React.Component {
     _displayFilm(){
         if(this.state.film != undefined){
             let genres = this.state.film.genres
-
+            let release_date = new Date(this.state.film.release_date)
             return(
                 <ScrollView style={styles.scrollview_container}>
                     <View style={styles.content_container}>
@@ -65,10 +67,10 @@ class FilmDetail extends React.Component {
                             <Text style={styles.overview}>{this.state.film.overview}</Text>
                         </View>
                         <View style={styles.detail_container}>
-                            <Text style={styles.date}>Sorti le : {this.state.film.release_date}</Text>
+                            <Text style={styles.date}>Sorti le : {moment(release_date).format('DD/MM/YYYY')}</Text>
                             <Text style={styles.note}>Note : {this.state.film.vote_average} / 10</Text>
                             <Text style={styles.vote}>Nombre de vote : {this.state.film.vote_count}</Text>
-                            <Text style={styles.budget}>Budget : {this.state.film.budget}</Text>
+                            <Text style={styles.budget}>Budget : {numeral(this.state.film.budget).format('0,0')} $</Text>
                             <Text style={styles.genre}>Genre(s) : {this._listToString(this.state.film.genres)}</Text>
                             <Text style={styles.firme}>Compagnie(s) : {this._listToString(this.state.film.production_companies)}</Text>
                         </View>
