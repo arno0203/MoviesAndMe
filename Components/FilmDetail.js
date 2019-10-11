@@ -1,82 +1,62 @@
+// Components/FilmDetail.js
+
 import React from 'react'
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native'
+import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
-import {StyleSheet, View, Text, Image, ActivityIndicator, ScrollView} from 'react-native'
-import {getFilmDetailFromApi, getImagesFromApi} from '../API/TMDBApi'
 
 class FilmDetail extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            film: undefined
-            , isLoading: true
+            film: undefined,
+            isLoading: true
         }
     }
 
     componentDidMount() {
-        let idFilm = this.props.navigation.getParam("idFilm")
-        getFilmDetailFromApi(idFilm).then(
-            data => {
-                this.setState({
-                    film: data
-                    , isLoading: false
-                })
-            }
-        )
+        getFilmDetailFromApi(this.props.navigation.state.params.idFilm).then(data => {
+            this.setState({
+                film: data,
+                isLoading: false
+            })
+        })
     }
 
     _displayLoading() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.loading_container}>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             )
         }
     }
 
-    _listToString(list){
-        let ret = ''
-        if(list.length > 1){
-            for(let element of list ){
-                console.log(element)
-                if(ret.length > 0){
-                    ret += " / "
-                }
-                ret += element.name
-            }
-        }
-        return ret
-    }
-
-    _displayFilm(){
-        if(this.state.film != undefined){
-            let genres = this.state.film.genres
-            let release_date = new Date(this.state.film.release_date)
-            return(
+    _displayFilm() {
+        const { film } = this.state
+        if (film != undefined) {
+            return (
                 <ScrollView style={styles.scrollview_container}>
-                    <View style={styles.content_container}>
-                        <Image
-                            style={styles.image}
-                            source={{uri: getImagesFromApi(this.state.film.poster_path)}}
-                        />
-                        <View style={styles.title_container}>
-                            <Text style={styles.title}>{this.state.film.title}</Text>
-                        </View>
-                        <View style={styles.content_container}>
-                            <Text style={styles.overview}>{this.state.film.overview}</Text>
-                        </View>
-                        <View style={styles.detail_container}>
-                            <Text style={styles.date}>Sorti le : {moment(release_date).format('DD/MM/YYYY')}</Text>
-                            <Text style={styles.note}>Note : {this.state.film.vote_average} / 10</Text>
-                            <Text style={styles.vote}>Nombre de vote : {this.state.film.vote_count}</Text>
-                            <Text style={styles.budget}>Budget : {numeral(this.state.film.budget).format('0,0')} $</Text>
-                            <Text style={styles.genre}>Genre(s) : {this._listToString(this.state.film.genres)}</Text>
-                            <Text style={styles.firme}>Compagnie(s) : {this._listToString(this.state.film.production_companies)}</Text>
-                        </View>
-                    </View>
-
-
+                    <Image
+                        style={styles.image}
+                        source={{uri: getImageFromApi(film.backdrop_path)}}
+                    />
+                    <Text style={styles.title_text}>{film.title}</Text>
+                    <Text style={styles.description_text}>{film.overview}</Text>
+                    <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
+                    <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
+                    <Text style={styles.default_text}>Nombre de votes : {film.vote_count}</Text>
+                    <Text style={styles.default_text}>Budget : {numeral(film.budget).format('0,0[.]00 $')}</Text>
+                    <Text style={styles.default_text}>Genre(s) : {film.genres.map(function(genre){
+                        return genre.name;
+                    }).join(" / ")}
+                    </Text>
+                    <Text style={styles.default_text}>Companie(s) : {film.production_companies.map(function(company){
+                        return company.name;
+                    }).join(" / ")}
+                    </Text>
                 </ScrollView>
             )
         }
@@ -95,8 +75,8 @@ class FilmDetail extends React.Component {
 const styles = StyleSheet.create({
     main_container: {
         flex: 1
-    }
-    , loading_container: {
+    },
+    loading_container: {
         position: 'absolute',
         left: 0,
         right: 0,
@@ -104,47 +84,36 @@ const styles = StyleSheet.create({
         bottom: 0,
         alignItems: 'center',
         justifyContent: 'center'
-    }
-    , scrollview_container:{
+    },
+    scrollview_container: {
         flex: 1
-    }
-    , content_container: {
-
-    }
-    , title_container: {
-
-    }
-    , detail_container:{
-
-    }
-    , image: {
-        width: 120,
-        height: 180,
+    },
+    image: {
+        height: 169,
         margin: 5
-    }
-    , title: {
-
-    }
-    , overview:{
-
-    }
-    , date: {
-
-    }
-    , note: {
-
-    }
-    , vote : {
-
-    }
-    , budget: {
-
-    }
-    , genre: {
-
-    }
-    , firme:{
-
+    },
+    title_text: {
+        fontWeight: 'bold',
+        fontSize: 35,
+        flex: 1,
+        flexWrap: 'wrap',
+        marginLeft: 5,
+        marginRight: 5,
+        marginTop: 10,
+        marginBottom: 10,
+        color: '#000000',
+        textAlign: 'center'
+    },
+    description_text: {
+        fontStyle: 'italic',
+        color: '#666666',
+        margin: 5,
+        marginBottom: 15
+    },
+    default_text: {
+        marginLeft: 5,
+        marginRight: 5,
+        marginTop: 5,
     }
 })
 

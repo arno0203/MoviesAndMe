@@ -18,6 +18,6 @@ export function getFilmDetailFromApi(id) {
         .catch((error) => console.error(error))
 }
 
-export function getImagesFromApi(name) {
+export function getImageFromApi(name) {
     return 'https://image.tmdb.org/t/p/w300' + name
 }

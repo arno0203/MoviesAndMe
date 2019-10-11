@@ -3,7 +3,7 @@
 import React from 'react'
 import moment from 'moment'
 import {StyleSheet, View, Text, Image, TouchableOpacity} from 'react-native'
-import {getImagesFromApi} from '../API/TMDBApi.js'
+import {getImageFromApi} from '../API/TMDBApi.js'
 
 class FilmItem extends React.Component {
     render() {
@@ -15,7 +15,7 @@ class FilmItem extends React.Component {
                 onPress={() => displayDetailForFilm(film.id)}>
                 <Image
                     style={styles.image}
-                    source={{uri: getImagesFromApi(film.poster_path)}}
+                    source={{uri: getImageFromApi(film.backdrop_path)}}
                 />
                 <View style={styles.content_container}>
                     <View style={styles.header_container}>
