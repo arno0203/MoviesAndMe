@@ -1,8 +1,8 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native'
-import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
+import {StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity} from 'react-native'
+import {getFilmDetailFromApi, getImageFromApi} from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
 import {connect} from 'react-redux'
@@ -25,18 +25,41 @@ class FilmDetail extends React.Component {
         })
     }
 
+    componentDidUpdate() {
+        console.log('ComponentDidUpdate:')
+        console.log(this.props.favoritesFilm)
+    }
+
     _displayLoading() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.loading_container}>
-                    <ActivityIndicator size='large' />
+                    <ActivityIndicator size='large'/>
                 </View>
             )
         }
     }
 
+    _toggleFavorite() {
+        const action = {type: "TOGGLE_FAVORITE", value: this.state.film}
+        this.props.dispatch(action)
+    }
+
+    _displayFavoriteImage() {
+        var sourceImage = require('../Images/ic_favorite_border.png')
+        if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
+            // Film dans nos favoris
+            sourceImage = require('../Images/ic_favorite.png')
+        }
+        return (
+            <Image style={styles.favorite_image}
+                source={sourceImage}
+            />
+        )
+    }
+
     _displayFilm() {
-        const { film } = this.state
+        const {film} = this.state
         if (film != undefined) {
             return (
                 <ScrollView style={styles.scrollview_container}>
@@ -45,16 +68,22 @@ class FilmDetail extends React.Component {
                         source={{uri: getImageFromApi(film.backdrop_path)}}
                     />
                     <Text style={styles.title_text}>{film.title}</Text>
+                    <TouchableOpacity
+                        style={styles.favorite_container}
+                        onPress={() => this._toggleFavorite()}>
+                        {this._displayFavoriteImage()}
+                    </TouchableOpacity>
                     <Text style={styles.description_text}>{film.overview}</Text>
-                    <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
+                    <Text style={styles.default_text}>Sorti
+                        le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
                     <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
                     <Text style={styles.default_text}>Nombre de votes : {film.vote_count}</Text>
                     <Text style={styles.default_text}>Budget : {numeral(film.budget).format('0,0[.]00 $')}</Text>
-                    <Text style={styles.default_text}>Genre(s) : {film.genres.map(function(genre){
+                    <Text style={styles.default_text}>Genre(s) : {film.genres.map(function (genre) {
                         return genre.name;
                     }).join(" / ")}
                     </Text>
-                    <Text style={styles.default_text}>Companie(s) : {film.production_companies.map(function(company){
+                    <Text style={styles.default_text}>Companie(s) : {film.production_companies.map(function (company) {
                         return company.name;
                     }).join(" / ")}
                     </Text>
@@ -90,6 +119,9 @@ const styles = StyleSheet.create({
     scrollview_container: {
         flex: 1
     },
+    favorite_container: {
+        alignItems: 'center',
+    },
     image: {
         height: 169,
         margin: 5
@@ -112,15 +144,21 @@ const styles = StyleSheet.create({
         margin: 5,
         marginBottom: 15
     },
-    default_text: {
+    default_text: {
         marginLeft: 5,
         marginRight: 5,
         marginTop: 5,
+    },
+    favorite_image: {
+        width: 40,
+        height: 40
     }
 })
 
 const mapStateToProps = (state) => {
-    return state
+    return {
+        favoritesFilm: state.favoritesFilm
+    }
 }
 
 export default connect(mapStateToProps)(FilmDetail)
