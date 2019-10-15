@@ -94,8 +94,9 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     favorite_image:{
-        width: 40,
-        height: 40
+        width: 25,
+        height: 25,
+        marginRight: 5
     }
 })
 
