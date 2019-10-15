@@ -26,8 +26,7 @@ class FilmDetail extends React.Component {
     }
 
     componentDidUpdate() {
-        console.log('ComponentDidUpdate:')
-        console.log(this.props.favoritesFilm)
+
     }
 
     _displayLoading() {

@@ -58,7 +58,6 @@ class Search extends React.Component {
     }
 
     _displayDetailForFilm = (idFilm) => {
-        console.log("Display film with id: "+idFilm)
         this.props.navigation.navigate("FilmDetail", { idFilm: idFilm})
     }
 
@@ -82,8 +81,14 @@ class Search extends React.Component {
                 <Button title='Rechercher' onPress={() => this._searchFilms()}/>
                 <FlatList
                     data={this.state.films}
+                    extraData={this.props.favoritesFilm}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({item}) => <FilmItem isFilmFavorite={this._isFilmFavorite} film={item} displayDetailForFilm={this._displayDetailForFilm}/>}
+                    renderItem={({item}) =>
+                        <FilmItem
+                            film={item}
+                            isFilmFavorite={this._isFilmFavorite(item.id)}
+                            displayDetailForFilm={this._displayDetailForFilm}/>
+                    }
                     onEndReachedThreshold={0.5}
                     onEndReached={() => {
                         if (this.page < this.totalPages) {

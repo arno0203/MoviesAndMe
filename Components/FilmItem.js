@@ -9,7 +9,7 @@ class FilmItem extends React.Component {
 
     _displayFavoriteImage() {
         var sourceImage = require('../Images/ic_favorite_border.png')
-        if (this.props.isFilmFavorite === true) {
+        if (this.props.isFilmFavorite == true) {
             // Film dans nos favoris
             sourceImage = require('../Images/ic_favorite.png')
         }
@@ -21,7 +21,7 @@ class FilmItem extends React.Component {
     }
 
     render() {
-        const {film, displayDetailForFilm, isFilmFavorite} = this.props
+        const {film, isFilmFavorite, displayDetailForFilm} = this.props
         let release_date = new Date(film.release_date)
         return (
             <TouchableOpacity
