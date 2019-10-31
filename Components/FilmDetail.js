@@ -1,7 +1,18 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import {StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity} from 'react-native'
+import {
+    StyleSheet,
+    View,
+    Text,
+    ActivityIndicator,
+    ScrollView,
+    Image,
+    TouchableOpacity,
+    Share,
+    Platform,
+    SafeAreaView
+} from 'react-native'
 import {getFilmDetailFromApi, getImageFromApi} from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
@@ -29,6 +40,28 @@ class FilmDetail extends React.Component {
 
     }
 
+    _shareFilm() {
+        const {film} = this.state
+        Share.share({title: film.title, message: film.overview})
+    }
+
+    _displayFloatingActionButton() {
+        const {film} = this.state
+        if (film != undefined && Platform.OS === 'android') {
+            return (
+                <TouchableOpacity
+                    style={styles.share_touchable_floatingactionbutton}
+                    onPress={() => this._shareFilm()}>
+                    <Image
+                        style={styles.share_image}
+                        source={require('../Images/ic_share.png')}
+                    />
+                </TouchableOpacity>
+            )
+
+        }
+    }
+
     _displayLoading() {
         if (this.state.isLoading) {
             return (
@@ -52,7 +85,7 @@ class FilmDetail extends React.Component {
         }
         return (
             <Image style={styles.favorite_image}
-                source={sourceImage}
+                   source={sourceImage}
             />
         )
     }
@@ -93,10 +126,13 @@ class FilmDetail extends React.Component {
 
     render() {
         return (
-            <View style={styles.main_container}>
-                {this._displayLoading()}
-                {this._displayFilm()}
-            </View>
+            <SafeAreaView style={styles.main_container}>
+                <View style={styles.main_container}>
+                    {this._displayLoading()}
+                    {this._displayFilm()}
+                    {this._displayFloatingActionButton()}
+                </View>
+            </SafeAreaView>
         )
     }
 }
@@ -123,6 +159,21 @@ const styles = StyleSheet.create({
     image: {
         height: 169,
         margin: 5
+    },
+    share_touchable_floatingactionbutton: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        right: 30,
+        bottom: 30,
+        borderRadius: 30,
+        backgroundColor: '#e91e63',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    share_image: {
+        width: 30,
+        height: 30
     },
     title_text: {
         fontWeight: 'bold',

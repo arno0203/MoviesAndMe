@@ -1,9 +1,10 @@
 // Components/Search.js
 
 import React from 'react'
-import { StyleSheet, View, TextInput, Button, ActivityIndicator } from 'react-native'
-import FilmList from './FilmList'
-import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi'
+import {StyleSheet, View, TextInput, Button, Text, FlatList, ActivityIndicator, SafeAreaView} from 'react-native'
+import FilmItem from './FilmItem'
+import {getFilmsFromApiWithSearchedText} from '../API/TMDBApi'
+import {connect} from 'react-redux'
 
 class Search extends React.Component {
 
@@ -20,12 +21,12 @@ class Search extends React.Component {
 
     _loadFilms() {
         if (this.searchedText.length > 0) {
-            this.setState({ isLoading: true })
-            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => {
+            this.setState({isLoading: true})
+            getFilmsFromApiWithSearchedText(this.searchedText, this.page + 1).then(data => {
                 this.page = data.page
                 this.totalPages = data.total_pages
                 this.setState({
-                    films: [ ...this.state.films, ...data.results ],
+                    films: [...this.state.films, ...data.results],
                     isLoading: false
                 })
             })
@@ -50,31 +51,55 @@ class Search extends React.Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.loading_container}>
-                    <ActivityIndicator size='large' />
+                    <ActivityIndicator size='large'/>
                 </View>
             )
         }
     }
 
+    _displayDetailForFilm = (idFilm) => {
+        this.props.navigation.navigate("FilmDetail", {idFilm: idFilm})
+    }
+
+    _isFilmFavorite = (idFilm) => {
+        if (this.props.favoritesFilm.findIndex(item => item.id === idFilm) !== -1) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     render() {
         return (
-            <View style={styles.main_container}>
-                <TextInput
-                    style={styles.textinput}
-                    placeholder='Titre du film'
-                    onChangeText={(text) => this._searchTextInputChanged(text)}
-                    onSubmitEditing={() => this._searchFilms()}
-                />
-                <Button title='Rechercher' onPress={() => this._searchFilms()}/>
-                <FilmList
-                    films={this.state.films}
-                    navigation={this.props.navigation}
-                    loadFilms={this._loadFilms}
-                    page={this.page}
-                    totalPages={this.totalPages} // les infos page et totalPages vont être utile, côté component FilmList, pour ne pas déclencher l'évènement pour charger plus de film si on a atteint la dernière page
-                />
-                {this._displayLoading()}
-            </View>
+            <SafeAreaView style={styles.main_container}>
+                <View style={styles.main_container}>
+                    <TextInput
+                        style={styles.textinput}
+                        placeholder='Titre du film'
+                        onChangeText={(text) => this._searchTextInputChanged(text)}
+                        onSubmitEditing={() => this._searchFilms()}
+                    />
+                    <Button title='Rechercher' onPress={() => this._searchFilms()}/>
+                    <FlatList
+                        data={this.state.films}
+                        extraData={this.props.favoritesFilm}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({item}) =>
+                            <FilmItem
+                                film={item}
+                                isFilmFavorite={this._isFilmFavorite(item.id)}
+                                displayDetailForFilm={this._displayDetailForFilm}/>
+                        }
+                        onEndReachedThreshold={0.5}
+                        onEndReached={() => {
+                            if (this.page < this.totalPages) {
+                                this._loadFilms()
+                            }
+                        }}
+                    />
+                    {this._displayLoading()}
+                </View>
+            </SafeAreaView>
         )
     }
 }
