@@ -1,33 +1,33 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import {
-    StyleSheet,
-    View,
-    Text,
-    ActivityIndicator,
-    ScrollView,
-    Image,
-    TouchableOpacity,
-    Share,
-    Platform,
-    SafeAreaView
-} from 'react-native'
-import {getFilmDetailFromApi, getImageFromApi} from '../API/TMDBApi'
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native'
+import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 class FilmDetail extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             film: undefined,
-            isLoading: true
+            isLoading: false
         }
     }
 
     componentDidMount() {
+        const favoriteFilmIndex = this.props.favoritesFilm.findIndex(item => item.id === this.props.navigation.state.params.idFilm)
+        if (favoriteFilmIndex !== -1) { // Film déjà dans nos favoris, on a déjà son détail
+            // Pas besoin d'appeler l'API ici, on ajoute le détail stocké dans notre state global au state de notre component
+            this.setState({
+                film: this.props.favoritesFilm[favoriteFilmIndex]
+            })
+            return
+        }
+        // Le film n'est pas dans nos favoris, on n'a pas son détail
+        // On appelle l'API pour récupérer son détail
+        this.setState({ isLoading: true })
         getFilmDetailFromApi(this.props.navigation.state.params.idFilm).then(data => {
             this.setState({
                 film: data,
@@ -36,44 +36,18 @@ class FilmDetail extends React.Component {
         })
     }
 
-    componentDidUpdate() {
-
-    }
-
-    _shareFilm() {
-        const {film} = this.state
-        Share.share({title: film.title, message: film.overview})
-    }
-
-    _displayFloatingActionButton() {
-        const {film} = this.state
-        if (film != undefined && Platform.OS === 'android') {
-            return (
-                <TouchableOpacity
-                    style={styles.share_touchable_floatingactionbutton}
-                    onPress={() => this._shareFilm()}>
-                    <Image
-                        style={styles.share_image}
-                        source={require('../Images/ic_share.png')}
-                    />
-                </TouchableOpacity>
-            )
-
-        }
-    }
-
     _displayLoading() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.loading_container}>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             )
         }
     }
 
     _toggleFavorite() {
-        const action = {type: "TOGGLE_FAVORITE", value: this.state.film}
+        const action = { type: "TOGGLE_FAVORITE", value: this.state.film }
         this.props.dispatch(action)
     }
 
@@ -84,14 +58,15 @@ class FilmDetail extends React.Component {
             sourceImage = require('../Images/ic_favorite.png')
         }
         return (
-            <Image style={styles.favorite_image}
-                   source={sourceImage}
+            <Image
+                style={styles.favorite_image}
+                source={sourceImage}
             />
         )
     }
 
     _displayFilm() {
-        const {film} = this.state
+        const { film } = this.state
         if (film != undefined) {
             return (
                 <ScrollView style={styles.scrollview_container}>
@@ -106,16 +81,15 @@ class FilmDetail extends React.Component {
                         {this._displayFavoriteImage()}
                     </TouchableOpacity>
                     <Text style={styles.description_text}>{film.overview}</Text>
-                    <Text style={styles.default_text}>Sorti
-                        le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
+                    <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
                     <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
                     <Text style={styles.default_text}>Nombre de votes : {film.vote_count}</Text>
                     <Text style={styles.default_text}>Budget : {numeral(film.budget).format('0,0[.]00 $')}</Text>
-                    <Text style={styles.default_text}>Genre(s) : {film.genres.map(function (genre) {
+                    <Text style={styles.default_text}>Genre(s) : {film.genres.map(function(genre){
                         return genre.name;
                     }).join(" / ")}
                     </Text>
-                    <Text style={styles.default_text}>Companie(s) : {film.production_companies.map(function (company) {
+                    <Text style={styles.default_text}>Companie(s) : {film.production_companies.map(function(company){
                         return company.name;
                     }).join(" / ")}
                     </Text>
@@ -126,13 +100,10 @@ class FilmDetail extends React.Component {
 
     render() {
         return (
-            <SafeAreaView style={styles.main_container}>
-                <View style={styles.main_container}>
-                    {this._displayLoading()}
-                    {this._displayFilm()}
-                    {this._displayFloatingActionButton()}
-                </View>
-            </SafeAreaView>
+            <View style={styles.main_container}>
+                {this._displayLoading()}
+                {this._displayFilm()}
+            </View>
         )
     }
 }
@@ -153,27 +124,9 @@ const styles = StyleSheet.create({
     scrollview_container: {
         flex: 1
     },
-    favorite_container: {
-        alignItems: 'center',
-    },
     image: {
         height: 169,
         margin: 5
-    },
-    share_touchable_floatingactionbutton: {
-        position: 'absolute',
-        width: 60,
-        height: 60,
-        right: 30,
-        bottom: 30,
-        borderRadius: 30,
-        backgroundColor: '#e91e63',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    share_image: {
-        width: 30,
-        height: 30
     },
     title_text: {
         fontWeight: 'bold',
@@ -187,13 +140,16 @@ const styles = StyleSheet.create({
         color: '#000000',
         textAlign: 'center'
     },
+    favorite_container: {
+        alignItems: 'center',
+    },
     description_text: {
         fontStyle: 'italic',
         color: '#666666',
         margin: 5,
         marginBottom: 15
     },
-    default_text: {
+    default_text: {
         marginLeft: 5,
         marginRight: 5,
         marginTop: 5,

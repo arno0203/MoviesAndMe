@@ -15,15 +15,8 @@ class FilmList extends React.Component {
     }
 
     _displayDetailForFilm = (idFilm) => {
-        this.props.navigation.navigate("FilmDetail", { idFilm: idFilm})
-    }
-
-    _isFilmFavorite = (idFilm) => {
-        if(this.props.favoritesFilm.findIndex(item => item.id === idFilm) !== -1 ) {
-            return true
-        }else{
-            return false
-        }
+        console.log("Display film " + idFilm)
+        this.props.navigation.navigate('FilmDetail', {idFilm: idFilm})
     }
 
     render() {
@@ -36,13 +29,13 @@ class FilmList extends React.Component {
                 renderItem={({item}) => (
                     <FilmItem
                         film={item}
-                        isFilmFavorite={this._isFilmFavorite(item.id)}
-                        displayDetailForFilm={this._displayDetailForFilm}/>
+                        isFilmFavorite={(this.props.favoritesFilm.findIndex(film => film.id === item.id) !== -1) ? true : false} // Bonus pour différencier les films déjà présent dans notre state global et qui n'ont donc pas besoin d'être récupérés depuis l'API
+                        displayDetailForFilm={this._displayDetailForFilm}
+                    />
                 )}
                 onEndReachedThreshold={0.5}
                 onEndReached={() => {
-                    if (this.props.page < this.props.totalPages) {
-                        // On appelle la méthode loadFilm du component Search pour charger plus de films
+                    if (!this.props.favoriteList && this.props.page < this.props.totalPages) {
                         this.props.loadFilms()
                     }
                 }}

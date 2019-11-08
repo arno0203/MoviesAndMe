@@ -1,13 +1,13 @@
-import React from 'react'
-import { StyleSheet, Image } from 'react-native';
-import {createStackNavigator} from 'react-navigation-stack'
-import {createAppContainer} from 'react-navigation'
+// Navigation/Navigations.js
 
-import {createBottomTabNavigator} from 'react-navigation-tabs'
+import React from 'react'
+import { StyleSheet, Image } from 'react-native'
+import { createAppContainer } from 'react-navigation'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
+import { createStackNavigator } from 'react-navigation-stack';
 import Search from '../Components/Search'
 import FilmDetail from '../Components/FilmDetail'
 import Favorites from '../Components/Favorites'
-import Test from '../Components/Test'
 
 const SearchStackNavigator = createStackNavigator({
     Search: {
@@ -16,26 +16,20 @@ const SearchStackNavigator = createStackNavigator({
             title: 'Rechercher'
         }
     },
-    Favorites:{
-        screen: Favorites
-        , navigationOptions: {
-            title: 'Favories'
-        }
-    },
     FilmDetail: {
         screen: FilmDetail
-        , navigationOptions: {
-            title: 'Détail'
-        }
     }
 })
 
 const FavoritesStackNavigator = createStackNavigator({
-    Favorites:{
-        screen: Favorites
-        , navigationOptions: {
-            title: 'Favories'
+    Favorites: {
+        screen: Favorites,
+        navigationOptions: {
+            title: 'Favoris'
         }
+    },
+    FilmDetail: {
+        screen: FilmDetail
     }
 })
 
@@ -44,10 +38,10 @@ const MoviesTabNavigator = createBottomTabNavigator(
         Search: {
             screen: SearchStackNavigator,
             navigationOptions: {
-                tabBarIcon: () => { // On définit le rendu de nos icônes par les images récemment ajoutés au projet
+                tabBarIcon: () => {
                     return <Image
                         source={require('../Images/ic_search.png')}
-                        style={styles.icon}/> // On applique un style pour les redimensionner comme il faut
+                        style={styles.icon}/>
                 }
             }
         },
@@ -64,10 +58,10 @@ const MoviesTabNavigator = createBottomTabNavigator(
     },
     {
         tabBarOptions: {
-            activeBackgroundColor: '#DDDDDD', // Couleur d'arrière-plan de l'onglet sélectionné
-            inactiveBackgroundColor: '#FFFFFF', // Couleur d'arrière-plan des onglets non sélectionnés
-            showLabel: false, // On masque les titres
-            showIcon: true // On informe le TabNavigator qu'on souhaite afficher les icônes définis
+            activeBackgroundColor: '#DDDDDD',
+            inactiveBackgroundColor: '#FFFFFF',
+            showLabel: false,
+            showIcon: true
         }
     }
 )
