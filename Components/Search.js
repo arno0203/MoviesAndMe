@@ -1,10 +1,10 @@
 // Components/Search.js
 
 import React from 'react'
-import { StyleSheet, View, TextInput, Button, Text, FlatList, ActivityIndicator } from 'react-native'
+import {StyleSheet, View, TextInput, Button, ActivityIndicator, SafeAreaView} from 'react-native'
 import FilmItem from './FilmItem'
 import FilmList from './FilmList'
-import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi'
+import {getFilmsFromApiWithSearchedText} from '../API/TMDBApi'
 
 class Search extends React.Component {
 
@@ -22,12 +22,12 @@ class Search extends React.Component {
 
     _loadFilms() {
         if (this.searchedText.length > 0) {
-            this.setState({ isLoading: true })
-            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => {
+            this.setState({isLoading: true})
+            getFilmsFromApiWithSearchedText(this.searchedText, this.page + 1).then(data => {
                 this.page = data.page
                 this.totalPages = data.total_pages
                 this.setState({
-                    films: [ ...this.state.films, ...data.results ],
+                    films: [...this.state.films, ...data.results],
                     isLoading: false
                 })
             })
@@ -50,15 +50,17 @@ class Search extends React.Component {
 
     _displayDetailForFilm = (idFilm) => {
         console.log("Display film with id " + idFilm)
-        this.props.navigation.navigate("FilmDetail", { idFilm: idFilm })
+        this.props.navigation.navigate("FilmDetail", {idFilm: idFilm})
     }
 
     _displayLoading() {
         if (this.state.isLoading) {
             return (
-                <View style={styles.loading_container}>
-                    <ActivityIndicator size='large' />
-                </View>
+                <SafeAreaView style={styles.loading_container}>
+                    <View style={styles.loading_container}>
+                        <ActivityIndicator size='large'/>
+                    </View>
+                </SafeAreaView>
             )
         }
     }
