@@ -4,6 +4,7 @@ import React from 'react'
 import moment from 'moment'
 import {StyleSheet, View, Text, Image, TouchableOpacity} from 'react-native'
 import {getImageFromApi} from '../API/TMDBApi.js'
+import FadeIn from '../Animations/FadeIn'
 
 class FilmItem extends React.Component {
 
@@ -24,6 +25,7 @@ class FilmItem extends React.Component {
         const {film, isFilmFavorite, displayDetailForFilm} = this.props
         let release_date = new Date(film.release_date)
         return (
+          <FadeIn>
             <TouchableOpacity
                 style={styles.main_container}
                 onPress={() => displayDetailForFilm(film.id)}>
@@ -45,6 +47,7 @@ class FilmItem extends React.Component {
                     </View>
                 </View>
             </TouchableOpacity>
+          </FadeIn>
         )
     }
 }
